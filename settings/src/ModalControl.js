@@ -1,21 +1,35 @@
 import {Component} from "@wordpress/element";
+import {useContext} from "react";
+import DashboardContext from "./contexts/DashboardContext";
 
-class ModalControl extends Component{
-    constructor() {
-        super( ...arguments );
-    }
-    componentDidMount() {
-        this.onClickHandler = this.onClickHandler.bind(this);
-    }
+const ModalControl = ({modalData, btnText}) => {
+    const { handleModal } = useContext(DashboardContext);
 
-    onClickHandler(){
-        this.props.handleModal(true, this.props.modalData );
+    const onClickHandler = () => {
+        handleModal(true, modalData)
     }
 
-    render(){
-        return (
-            <button onClick={ (e) => this.onClickHandler(e) }>{this.props.btnText}</button>
-        )
-    }
+    return (
+        <button onClick={ (e) => onClickHandler(e) }>{btnText}</button>
+    )
 }
+
+// class ModalControl extends Component{
+//     constructor() {
+//         super( ...arguments );
+//     }
+//     componentDidMount() {
+//         this.onClickHandler = this.onClickHandler.bind(this);
+//     }
+//
+//     onClickHandler(){
+//         this.props.handleModal(true, this.props.modalData );
+//     }
+//
+//     render(){
+//         return (
+//             <button onClick={ (e) => this.onClickHandler(e) }>{this.props.btnText}</button>
+//         )
+//     }
+// }
 export default ModalControl
