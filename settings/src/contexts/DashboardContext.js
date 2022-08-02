@@ -1,5 +1,4 @@
-import React, { createContext, useState, useEffect } from "react";
-import * as rsssl_api from "../utils/api";
+import { createContext } from "@wordpress/element";
 
 const DashboardContext = createContext();
 export default DashboardContext;

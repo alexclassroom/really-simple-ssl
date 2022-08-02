@@ -1,14 +1,23 @@
-import {Component, Fragment} from "@wordpress/element";
+import {Component, Fragment, useEffect, useState} from "@wordpress/element";
 /**
  * Render a help notice in the sidebar
  */
 
 const Help = ({key, index, help, fieldId}) => {
-    const notice = help;
-    if ( !notice.title ){
-        notice.title = notice.text;
-        notice.text = false;
-    }
+    const [notice, setNotice] = useState(help)
+    
+    useEffect(() => {
+        if ( !notice.title ){
+            notice.title = notice.text;
+            notice.text = false;
+            setNotice({
+                ...notice,
+                title: notice.text,
+                text: false
+            })
+        }
+    }, [notice])
+
 
     return (
         <Fragment>

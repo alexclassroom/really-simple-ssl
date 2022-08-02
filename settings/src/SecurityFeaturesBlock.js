@@ -12,11 +12,16 @@ const SecurityFeaturesBlock = ({fields}) => {
         );
     }
 
-    fields = fields.filter( field => field.new_features_block===true );
 
     return (
         <div>
-            {fields.map((field, i) => <SecurityFeatureBullet key={i} index={i} field={field} fields={fields}/>)}
+            {
+                fields
+                    .filter( field => field.new_features_block===true )
+                    .map((field, i) =>
+                        <SecurityFeatureBullet key={i} index={i} field={field} fields={fields}/>
+                    )
+            }
         </div>
     );
 }

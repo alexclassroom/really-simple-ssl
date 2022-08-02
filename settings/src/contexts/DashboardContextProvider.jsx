@@ -1,7 +1,6 @@
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "@wordpress/element";
 import * as rsssl_api from "../utils/api";
 import DashboardContext from "./DashboardContext";
-import Placeholder from "../Placeholder";
 
 const DashboardContextProvider = (props) => {
     const [selectedMainMenuItem, setSelectedMainMenuItem] = useState('dashboard');
@@ -58,12 +57,12 @@ const DashboardContextProvider = (props) => {
         setPageProps({
             licenseStatus: rsssl_settings.licenseStatus ? rsssl_settings.licenseStatus : 'invalid'
         })
-    })
 
-    useEffect(() => {
         getFields().then((response) => {
             let fields = response.fields;
             let menu = response.menu;
+            let menuItems = addVisibleToMenuItems(menu.menu_items);
+            menu.menu_items = menuItems;
             let progress = response.progress;
             setFields(fields);
             setMenu(menu);
@@ -72,6 +71,17 @@ const DashboardContextProvider = (props) => {
             getPreviousAndNextMenuItems(menu.menu_items);
         });
     }, []);
+
+    const addVisibleToMenuItems = (menuItems) => {
+        const newMenuItems = menuItems;
+        for (const [index, value] of menuItems.entries()) {
+            newMenuItems[index].visible = true;
+            if(value.hasOwnProperty('menu_items')) {
+                newMenuItems[index].menu_items = addVisibleToMenuItems(value.menu_items);
+            }
+        }
+        return newMenuItems;
+    }
 
     const setNewPageProps = (key, value) => {
         pageProps[key] = value;
@@ -86,9 +96,11 @@ const DashboardContextProvider = (props) => {
 
     const menuItemParser = (parsedMenuItems, menuItems) => {
         menuItems.forEach((menuItem) => {
-            parsedMenuItems.push(menuItem.id);
-            if(menuItem.hasOwnProperty('menu_items')) {
-                menuItemParser(parsedMenuItems, menuItem.menu_items);
+            if(menuItem.visible) {
+                parsedMenuItems.push(menuItem.id);
+                if(menuItem.hasOwnProperty('menu_items')) {
+                    menuItemParser(parsedMenuItems, menuItem.menu_items);
+                }
             }
         });
 
@@ -150,6 +162,22 @@ const DashboardContextProvider = (props) => {
         setHighLightedField(fieldId);
     }
 
+    const filterMenuItems = (menuItems, fields) => {
+        const newMenuItems = menuItems;
+        for (const [index, value] of menuItems.entries()) {
+            const searchResult = fields.filter((field) => (field.menu_id === value.id && field.visible));
+            if(searchResult.length === 0) {
+                newMenuItems[index].visible = false;
+            } else {
+                newMenuItems[index].visible = true;
+                if(value.hasOwnProperty('menu_items')) {
+                    newMenuItems[index].menu_items = filterMenuItems(value.menu_items, fields);
+                }
+            }
+        }
+        return newMenuItems;
+    }
+
     return (
         <DashboardContext.Provider value={{
             selectedMainMenuItem,
@@ -185,6 +213,7 @@ const DashboardContextProvider = (props) => {
             handleModal,
             updateField,
             highLightField,
+            filterMenuItems
         }}>
             { props.children }
         </DashboardContext.Provider>

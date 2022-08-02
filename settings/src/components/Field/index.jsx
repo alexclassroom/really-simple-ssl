@@ -12,14 +12,13 @@ import ContentSecurityPolicyField from "./components/ContentSecurityPolicyField"
 import MixedContentScanField from "./components/MixedContentScanField";
 import LicenseField from "./components/LicenseField";
 
-const Field = ({ showSavedSettingsNotice, fieldsUpdateComplete, saveChangedFields, field, fields, index}) => {
+const Field = ({ fieldsUpdateComplete, saveChangedFields, fields, index, onChangeHandler}) => {
     const {
         dropItemFromModal,
         handleModal,
         updateField,
         highLightField,
-        highLightedField,
-        setFields
+        highLightedField
     } = useContext(DashboardContext);
 
     const [options, setOptions] = useState([]);
@@ -27,23 +26,21 @@ const Field = ({ showSavedSettingsNotice, fieldsUpdateComplete, saveChangedField
     useEffect(() => {
         highLightField('');
         let options = [];
-        if ( field.options ) {
-            for (let key in field.options) {
-                if (field.options.hasOwnProperty(key)) {
+        if ( fields[index].options ) {
+            for (let key in fields[index].options) {
+                if (fields[index].options.hasOwnProperty(key)) {
                     let item = {};
-                    item.label = field.options[key];
+                    item.label = fields[index].options[key];
                     item.value = key;
                     options.push(item);
                 }
             }
         }
         setOptions(options);
-    }, []);
+    }, [fields]);
 
-    const onChangeHandler = (fieldValue) => {
-        fields[index]['value'] = fieldValue;
-        saveChangedFields( field.id );
-        setFields(fields);
+    const onChange = (newValue) => {
+        onChangeHandler(index, newValue);
     }
 
     /**
@@ -53,11 +50,11 @@ const Field = ({ showSavedSettingsNotice, fieldsUpdateComplete, saveChangedField
      * @param type
      */
     const onChangeHandlerDataTable = (enabled, clickedItem, type ) => {
-        if (typeof field.value === 'object') {
-            field.value = Object.values(field.value);
+        if (typeof fields[index].value === 'object') {
+            fields[index].value = Object.values(fields[index].value);
         }
         //find this item in the field list
-        for (const item of field.value){
+        for (const item of fields[index].value){
             if (item.id === clickedItem.id) {
                 item[type] = enabled;
             }
@@ -65,43 +62,43 @@ const Field = ({ showSavedSettingsNotice, fieldsUpdateComplete, saveChangedField
             delete item.statusControl;
         }
         //the updateItemId allows us to update one specific item in a field set.
-        field.updateItemId = clickedItem.id;
+        fields[index].updateItemId = clickedItem.id;
         let saveFields = [];
-        saveFields.push(field);
-        updateField(field);
+        saveFields.push(fields[index]);
+        updateField(fields[index]);
         rsssl_api.setFields(saveFields).then(( response ) => {
             //this.props.showSavedSettingsNotice();
         });
     }
 
-    const highLightClass = highLightedField === field.id ? 'rsssl-highlight' : '';
+    const highLightClass = highLightedField === fields[index].id ? 'rsssl-highlight' : '';
 
-    if ( !field.visible ) {
+    if ( !fields[index].visible ) {
         return (
             <InvisibleField />
         );
     }
 
-    if ( field.type==='checkbox' ){
+    if ( fields[index].type==='checkbox' ){
         return (
-            <CheckboxField field={field} highLightClass={highLightClass} onChangeHandler={onChangeHandler} />
+            <CheckboxField field={fields[index]} highLightClass={highLightClass} onChangeHandler={onChange} />
         );
     }
-    if ( field.type==='radio' ){
+    if ( fields[index].type==='radio' ){
         return (
-            <RadioField field={field} highLightClass={highLightClass} options={options} onChangeHandler={onChangeHandler}/>
+            <RadioField field={fields[index]} highLightClass={highLightClass} options={options} onChangeHandler={onChange}/>
         );
     }
-    if ( field.type==='text' ){
+    if ( fields[index].type==='text' ){
         return (
-            <TextField field={field} highLightClass={highLightClass} onChangeHandler={onChangeHandler}/>
+            <TextField field={fields[index]} highLightClass={highLightClass} onChangeHandler={onChange}/>
         );
     }
 
-    if ( field.type==='license' ){
+    if ( fields[index].type==='license' ){
         return (
            <LicenseField
-               field={field}
+               field={fields[index]}
                fields={fields}
                fieldsUpdateComplete={fieldsUpdateComplete}
                saveChangedFields={saveChangedFields}
@@ -109,43 +106,43 @@ const Field = ({ showSavedSettingsNotice, fieldsUpdateComplete, saveChangedField
                highLightClass={highLightClass}/>
         );
     }
-    if ( field.type==='number' ){
+    if ( fields[index].type==='number' ){
         return (
-            <NumberField field={field} highLightClass={highLightClass} onChangeHandler={onChangeHandler}/>
+            <NumberField field={fields[index]} highLightClass={highLightClass} onChangeHandler={onChange}/>
         );
     }
-    if ( field.type==='email' ){
+    if ( fields[index].type==='email' ){
         return (
-            <TextField field={field} highLightClass={highLightClass} onChangeHandler={onChangeHandler}/>
+            <TextField field={fields[index]} highLightClass={highLightClass} onChangeHandler={onChange}/>
         );
     }
 
-    if ( field.type==='select') {
+    if ( fields[index].type==='select') {
         return (
-            <SelectField field={field} highLightClass={highLightClass} options={options} onChangeHandler={onChangeHandler}/>
+            <SelectField field={fields[index]} highLightClass={highLightClass} options={options} onChangeHandler={onChange}/>
         )
     }
 
-    if ( field.type==='permissionspolicy' ) {
+    if ( fields[index].type==='permissionspolicy' ) {
         return (
-            <PermissionsPolicyField field={field} highLightClass={highLightClass} options={options} onChangeHandlerDataTable={onChangeHandlerDataTable}/>
+            <PermissionsPolicyField field={fields[index]} highLightClass={highLightClass} options={options} onChangeHandlerDataTable={onChangeHandlerDataTable}/>
         )
     }
 
-    if ( field.type==='contentsecuritypolicy' ) {
+    if ( fields[index].type==='contentsecuritypolicy' ) {
         return (
-            <ContentSecurityPolicyField field={field} highLightClass={highLightClass} onChangeHandlerDataTable={onChangeHandlerDataTable}/>
+            <ContentSecurityPolicyField field={fields[index]} highLightClass={highLightClass} onChangeHandlerDataTable={onChangeHandlerDataTable}/>
         )
     }
 
-    if ( field.type === 'mixedcontentscan' ) {
+    if ( fields[index].type === 'mixedcontentscan' ) {
         return (
-            <MixedContentScanField fields={fields} field={field} handleModal={handleModal} dropItemFromModal={dropItemFromModal}/>
+            <MixedContentScanField fields={fields} field={fields[index]} handleModal={handleModal} dropItemFromModal={dropItemFromModal}/>
         )
     }
 
     return (
-        'not found field type ' + field.type
+        'not found field type ' + fields[index].type
     );
 }
 

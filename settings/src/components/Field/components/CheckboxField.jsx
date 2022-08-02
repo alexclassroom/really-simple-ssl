@@ -8,7 +8,7 @@ const CheckboxField = ({ highLightClass, field, onChangeHandler }) => {
                 checked= { field.value === 1 }
                 help={ field.comment }
                 label={ field.label }
-                onChange={ ( fieldValue ) => onChangeHandler(fieldValue) }
+                onChange={ ( fieldValue ) => onChangeHandler(fieldValue ? 1 : 0 ) }
             />
         </PanelRow>
     );

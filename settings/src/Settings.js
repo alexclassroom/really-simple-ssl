@@ -7,53 +7,65 @@ import {
     Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import {useContext, useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "@wordpress/element";
 import DashboardContext from "./contexts/DashboardContext";
 
 /**
  * Renders the selected settings
  *
  */
-const Settings = ({previousStep, save, saveAndContinue, saveChangedFields, showSavedSettingsNotice, fieldsUpdateComplete, menuItems}) => {
-    const { fields, progress, isAPILoaded, selectedMenuItem, previousMenuItem, nextMenuItem } = useContext(DashboardContext);
+const Settings = ({previousStep, save, saveAndContinue, saveChangedFields, showSavedSettingsNotice, fieldsUpdateComplete}) => {
+    const { menu, fields, progress, isAPILoaded, selectedMenuItem, previousMenuItem, nextMenuItem } = useContext(DashboardContext);
 
-    let selectedMenuItemObject;
-    for (const item of menuItems){
-        if (item.id === selectedMenuItem ) {
-            selectedMenuItemObject = item;
-        } else if (item.menu_items) {
-            selectedMenuItemObject = item.menu_items.filter(menuItem => menuItem.id === selectedMenuItem)[0];
-        }
-        if ( selectedMenuItemObject ) {
-            break;
-        }
-    }
+    const [selectedMenuItemObject, setSelectedMenuItemObject] = useState(null);
+    const [selectedFields, setSelectedFields] = useState(null);
+    const [groups, setGroups] = useState(null);
+    const [notices, setNotices] = useState(null);
 
-    let selectedFields = fields.filter(field => field.menu_id === selectedMenuItem);
-    let groups = [];
-    for (const selectedField of selectedFields){
-        if ( !in_array(selectedField.group_id, groups) ){
-            groups.push(selectedField.group_id);
+    useEffect(() => {
+        let selectedMenuItemObject;
+        for (const item of menu.menu_items){
+            if (item.id === selectedMenuItem ) {
+                selectedMenuItemObject = item;
+            } else if (item.menu_items) {
+                selectedMenuItemObject = item.menu_items.filter(menuItem => menuItem.id === selectedMenuItem)[0];
+            }
+            if ( selectedMenuItemObject ) {
+                break;
+            }
         }
-    }
 
-    //convert progress notices to an array useful for the help blocks
-    let notices = [];
-    for (const notice of progress.notices){
-        if ( notice.menu_id === selectedMenuItem ) {
-            let help = {};
-            help.title = notice.output.title ? notice.output.title : false;
-            help.label = notice.output.label;
-            help.id = notice.field_id;
-            help.text = notice.output.msg;
-            notices.push(help);
+        let selectedFields = fields.filter(field => field.menu_id === selectedMenuItem);
+        let groups = [];
+        for (const selectedField of selectedFields){
+            if ( !in_array(selectedField.group_id, groups) ){
+                groups.push(selectedField.group_id);
+            }
         }
-    }
-    for (const notice of selectedFields.filter(field => field.help)){
-        let help = notice.help;
-        help.id = notice.id;
-        notices.push(notice.help);
-    }
+
+        //convert progress notices to an array useful for the help blocks
+        let notices = [];
+        for (const notice of progress.notices){
+            if ( notice.menu_id === selectedMenuItem ) {
+                let help = {};
+                help.title = notice.output.title ? notice.output.title : false;
+                help.label = notice.output.label;
+                help.id = notice.field_id;
+                help.text = notice.output.msg;
+                notices.push(help);
+            }
+        }
+        for (const notice of selectedFields.filter(field => field.help)){
+            let help = notice.help;
+            help.id = notice.id;
+            notices.push(notice.help);
+        }
+
+        setSelectedMenuItemObject(selectedMenuItemObject)
+        setSelectedFields(selectedFields)
+        setGroups(groups)
+        setNotices(notices)
+    }, [selectedMenuItem])
 
     if ( ! isAPILoaded ) {
         return (
@@ -65,7 +77,7 @@ const Settings = ({previousStep, save, saveAndContinue, saveChangedFields, showS
         <Fragment>
             <div className="rsssl-wizard-settings rsssl-column-2">
                 {
-                    groups.map((group, i) =>
+                    groups && groups.map((group, i) =>
                         <SettingsGroup
                             key={i}
                             index={i}
@@ -79,7 +91,7 @@ const Settings = ({previousStep, save, saveAndContinue, saveChangedFields, showS
                 }
                 <div className="rsssl-grid-item-footer">
                     {/*This will be shown only if current step is not the first one*/}
-                    { menuItems.length > 0 && selectedMenuItem !== menuItems[0].id &&
+                    { menu.menu_items.length > 0 && selectedMenuItem !== menu.menu_items[0].id &&
                         <a href={`#settings/${previousMenuItem}`} onClick={ () => previousStep(true) }>
                             { __('Previous', 'really-simple-ssl') }
                         </a>
@@ -92,7 +104,7 @@ const Settings = ({previousStep, save, saveAndContinue, saveChangedFields, showS
                     </Button>
 
                     {/*This will be shown only if current step is not the last one*/}
-                    { menuItems.length > 0 && selectedMenuItem !== menuItems[menuItems.length-1].id &&
+                    { menu.menu_items.length > 0 && selectedMenuItem !== menu.menu_items[menu.menu_items.length-1].id &&
                         <a href={`#settings/${nextMenuItem}`} onClick={ saveAndContinue }>
                             { __( 'Save and Continue', 'really-simple-ssl' ) }
                         </a>
@@ -100,7 +112,7 @@ const Settings = ({previousStep, save, saveAndContinue, saveChangedFields, showS
                 </div>
             </div>
             <div className="rsssl-wizard-help">
-                {notices.map((field, i) => <Help key={i} index={i} help={field} fieldId={field.id}/>)}
+                {notices && notices.map((field, i) => <Help key={i} index={i} help={field} fieldId={field.id}/>)}
             </div>
         </Fragment>
     )

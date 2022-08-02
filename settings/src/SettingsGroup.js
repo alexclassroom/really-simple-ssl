@@ -3,19 +3,20 @@ import Field from "./components/Field";
 import Hyperlink from "./Utils/Hyperlink";
 
 import { __ } from '@wordpress/i18n';
-import {useContext, useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "@wordpress/element";
 import DashboardContext from "./contexts/DashboardContext";
 
 /**
  * Render a grouped block of settings
  */
 const SettingsGroup = ({ showSavedSettingsNotice, fieldsUpdateComplete, selectedMenuItem, saveChangedFields, group, fields }) => {
-    const {pageProps, setSelectedMenuItem} = useContext(DashboardContext);
+    const {pageProps, setSelectedMenuItem, fields: allFields, setFields} = useContext(DashboardContext);
 
     const [disabled, setDisabled] = useState(false);
     const [msg, setMsg] = useState('');
     const [activeGroup, setActiveGroup] = useState('');
     const [upgrade, setUpgrade] = useState('');
+    const [selectedFields, setSelectedFields] = useState(null);
 
     useEffect(() => {
         let msg = __("Learn more about %sPremium%s", "really-simple-ssl");
@@ -40,6 +41,15 @@ const SettingsGroup = ({ showSavedSettingsNotice, fieldsUpdateComplete, selected
 
         let disabled = status !== 'valid' && activeGroup.premium;
 
+        let selectedFields = [];
+        //get all fields with group_id this.props.group_id
+        for (const selectedField of fields){
+            if (selectedField.group_id === group ){
+                selectedFields.push(selectedField);
+            }
+        }
+        setSelectedFields(selectedFields);
+
         setDisabled(disabled);
         setMsg(msg);
         setActiveGroup(activeGroup);
@@ -57,12 +67,24 @@ const SettingsGroup = ({ showSavedSettingsNotice, fieldsUpdateComplete, selected
         setSelectedMenuItem(id);
     }
 
-    let selectedFields = [];
-    //get all fields with group_id this.props.group_id
-    for (const selectedField of fields){
-        if (selectedField.group_id === group ){
-            selectedFields.push(selectedField);
-        }
+    const onChangeHandler = (index, fieldValue) => {
+        const newSelectedFields = selectedFields.map((field, i) => {
+            if(i === index) {
+                const newField = { ...field, value: fieldValue }
+                const newFields = allFields.map((allField) => {
+                    if(allField.id === field.id) {
+                        return { ...allField, value: fieldValue };
+                    }
+                    return allField;
+                });
+                setFields(newFields);
+                return newField;
+            }
+            return field;
+        })
+
+        saveChangedFields(newSelectedFields[index].id );
+        setSelectedFields(newSelectedFields)
     }
 
     return (
@@ -76,15 +98,15 @@ const SettingsGroup = ({ showSavedSettingsNotice, fieldsUpdateComplete, selected
             <div className="rsssl-grid-item-content">
                 {activeGroup && activeGroup.intro && <div className="rsssl-settings-block-intro">{activeGroup.intro}</div>}
                 {
-                    selectedFields.map((field, i) =>
+                    selectedFields && selectedFields.map((field, i) =>
                         <Field
                             key={i}
                             index={i}
                             showSavedSettingsNotice={showSavedSettingsNotice}
                             fieldsUpdateComplete = {fieldsUpdateComplete}
                             saveChangedFields={saveChangedFields}
-                            field={field}
                             fields={selectedFields}
+                            onChangeHandler={onChangeHandler}
                         />
                     )
                 }

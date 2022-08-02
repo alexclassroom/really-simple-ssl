@@ -41,7 +41,7 @@ const MenuItem = ({menuItem}) => {
     }
 
     return (
-        <div className={"rsssl-menu-item" + activeClass + featuredClass}>
+        menuItem.visible && <div className={"rsssl-menu-item" + activeClass + featuredClass}>
             <a href={href} onClick={() => handleClick()}>
                 <span>{menuItem.title}</span>
                 { menuItem.featured && <p className="rsssl-menu-item-featured">{menuItem.featured}</p>}
@@ -50,7 +50,7 @@ const MenuItem = ({menuItem}) => {
                 (menuItem.menu_items && menuSelected) &&
                 <div className="rsssl-submenu-item">
                     {
-                        menuItem.menu_items.map((subMenuItem, i) => <MenuItem key={i} menuItem={subMenuItem}/>)
+                        menuItem.menu_items.map((subMenuItem, i) => subMenuItem.visible && <MenuItem key={i} menuItem={subMenuItem}/>)
                     }
                 </div>
             }

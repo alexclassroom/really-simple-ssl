@@ -4,14 +4,13 @@ import {
 } from '@wordpress/element';
 
 const PagePlaceholder = () => {
-    let plugin_url = rsssl_settings.plugin_url;
     return (
         <Fragment>
             <div className="rsssl-header-container">
 
                 <div className="rsssl-header">
                     <img className="rsssl-logo"
-                         src={plugin_url + 'assets/img/really-simple-ssl-logo.svg'}
+                         src={rsssl_settings.plugin_url + 'assets/img/really-simple-ssl-logo.svg'}
                          alt="Really Simple SSL logo"/>
                 </div>
             </div>

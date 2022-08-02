@@ -1,6 +1,6 @@
 import {Component, Fragment} from "@wordpress/element";
 import GridBlock from "./GridBlock";
-import {useEffect, useState} from "react";
+import {useEffect, useState} from "@wordpress/element";
 
 const DashboardPage = () => {
     const [blocks, setBlocks] = useState([]);

@@ -2,12 +2,18 @@ import {useContext} from "react";
 import DashboardContext from "../../contexts/DashboardContext";
 import MenuItem from "./components/MenuItem";
 import Placeholder from '../../Placeholder';
+import {useEffect, useState} from "@wordpress/element";
 
 /**
  * Menu block, rendering th entire menu
  */
-const Menu = ({menuItems}) => {
+const Menu = () => {
     const {isAPILoaded, menu} = useContext(DashboardContext);
+    const [menuItems, setMenuItems] = useState(null)
+
+    useEffect(() => {
+        setMenuItems(menu.menu_items)
+    }, [menu])
 
     if(!isAPILoaded) {
         return (
@@ -23,7 +29,7 @@ const Menu = ({menuItems}) => {
             <div className="rsssl-grid-item-content">
                 <div className="rsssl-wizard-menu-items">
                     {
-                        menuItems.map((menuItem, i) =>
+                        menuItems && menuItems.map((menuItem, i) =>
                             <MenuItem key={i} menuItem={menuItem}/>
                         )
                     }

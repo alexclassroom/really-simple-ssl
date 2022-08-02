@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, StrictMode } from "@wordpress/element";
 import Header from "./Header";
 import DashboardPage from "./DashboardPage";
 import SettingsPage from "./SettingsPage";
@@ -8,6 +8,7 @@ import DashboardContext from "./contexts/DashboardContext";
 
 const Page = () => {
     const { isAPILoaded, showModal, selectedMainMenuItem } = useContext(DashboardContext);
+
     return (
         <div className="rsssl-wrapper">
             {!isAPILoaded && <PagePlaceholder />}
@@ -16,14 +17,16 @@ const Page = () => {
                 (
                     <>
                         <Header />
-                        <div className={"rsssl-content-area rsssl-grid rsssl-" + selectedMainMenuItem}>
-                            { selectedMainMenuItem === 'settings' &&
-                                <SettingsPage />
-                            }
-                            { selectedMainMenuItem === 'dashboard' &&
-                                <DashboardPage />
-                            }
-                        </div>
+                        <StrictMode>
+                            <div className={"rsssl-content-area rsssl-grid rsssl-" + selectedMainMenuItem}>
+                                { selectedMainMenuItem === 'settings' &&
+                                    <SettingsPage />
+                                }
+                                { selectedMainMenuItem === 'dashboard' &&
+                                    <DashboardPage />
+                                }
+                            </div>
+                        </StrictMode>
                     </>
                 )
             }

@@ -9,7 +9,7 @@ import ProgressHeader from "./ProgressHeader";
 import SecurityFeaturesBlock from './SecurityFeaturesBlock';
 import Placeholder from './Placeholder';
 import GridButton from "./components/GridButton";
-import {useContext, useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "@wordpress/element";
 import DashboardContext from "./contexts/DashboardContext";
 
 

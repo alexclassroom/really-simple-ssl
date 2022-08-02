@@ -9,7 +9,7 @@ import sleeper from "./utils/sleeper.js";
 
 import {dispatch,} from '@wordpress/data';
 import {__} from '@wordpress/i18n';
-import {useContext, useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "@wordpress/element";
 import DashboardContext from "./contexts/DashboardContext";
 
 /**
@@ -18,42 +18,20 @@ import DashboardContext from "./contexts/DashboardContext";
  */
 
 const SettingsPage = () => {
-    const { fields, menu, setMenu, isAPILoaded, setIsAPILoaded, getPreviousAndNextMenuItems, setSelectedMenuItem } = useContext(DashboardContext)
-    const [menuItems, setMenuItems] = useState(menu.menu_items);
+    const { fields, menu, setMenu, isAPILoaded, getPreviousAndNextMenuItems, setSelectedMenuItem, filterMenuItems } = useContext(DashboardContext)
     const [changedFields, setChangedFields] = useState([]);
 
     useEffect(() => {
-        updateFieldsListWithConditions();
-        //if count >1, it's a wizard
-        let menuItems = [];
-        let changedFields = [];
-        menu.menu_items = filterMenuItems(menu.menu_items);
-        setMenu(menu);
-        menuItems = menu.menu_items;
-        setMenuItems(menuItems);
-        setChangedFields(changedFields);
-        setIsAPILoaded(true);
-    }, []);
+        updateFieldsListWithConditions()
+    }, [fields])
 
-    const filterMenuItems = (menuItems) => {
-        const newMenuItems = menuItems;
-        for (const [index, value] of menuItems.entries()) {
-            const searchResult = fields.filter((field) => (field.menu_id === value.id && field.visible));
-            if(searchResult.length === 0) {
-                newMenuItems.splice(index, 1);
-            } else {
-                if(value.hasOwnProperty('menu_items')) {
-                    newMenuItems[index].menu_items = filterMenuItems(value.menu_items);
-                }
-            }
-        }
-        return newMenuItems;
-    }
 
     const updateFieldsListWithConditions = () => {
         for (const field of fields){
             fields[fields.indexOf(field)].visible = !(field.hasOwnProperty('react_conditions') && !validateConditions(field.react_conditions, fields));
         }
+        const newMenu = filterMenuItems(menu.menu_items, fields)
+        setMenu({...menu, menu_items: newMenu});
     }
 
     const saveChangedFields = (changedField) => {
@@ -152,7 +130,7 @@ const SettingsPage = () => {
 
     return (
         <Fragment>
-            <Menu menuItems={menuItems}/>
+            <Menu />
             <Settings
                 previousStep = {wizardNextPrevious}
                 save={save}
@@ -160,7 +138,6 @@ const SettingsPage = () => {
                 saveChangedFields={saveChangedFields}
                 showSavedSettingsNotice={showSavedSettingsNotice}
                 fieldsUpdateComplete={changedFields.length === 0}
-                menuItems={menuItems}
             />
             <Notices className="rsssl-wizard-notices"/>
         </Fragment>
