@@ -81,6 +81,14 @@ $rsssl_integrations_list = apply_filters( 'rsssl_integrations', array(
 	    'option_id'            => 'disable_xmlrpc',
 	    'always_include'       => false,
     ),
+    'vulnerabilities' => array(
+	    'label'                => 'Vulnerabilities',
+	    'folder'               => 'wordpress',
+	    'impact'               => 'medium',
+	    'risk'                 => 'low',
+	    'option_id'            => 'vulnerabilities',
+	    'always_include'       => true,
+    ),
 ) );
 
 /**
