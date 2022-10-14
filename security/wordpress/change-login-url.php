@@ -5,41 +5,32 @@ class rsssl_change_login_url {
 	private $wp_login_php;
 
 	function __construct() {
-		if ( ! $this->test_new_login_success() ) {
-			return;
-		}
+
+//		if ( ! $this->test_new_login_success() ) {
+//			return;
+//		}
 
 		//send login mail if user uses this parameter
 		if ( isset($GET['rssslgetlogin'] ) ) {
-			$this->send_mail();
+
+			$args = [
+				'to' => get_bloginfo('admin_email'),
+				'headers' => array('Content-Type: text/html; charset=UTF-8'),
+				'body' => trailingslashit( site_url() ) . $this->new_login_slug(),
+				'subject' => '<div>' . __("[Really Simple SSL] You can log in to your site via", "really-simple-ssl") . "</div>",
+			];
+
+			new rsssl_mailer( $args );
 		}
 
+		remove_action( 'template_redirect', 'wp_redirect_admin_locations', 1000 );
 		add_action( 'plugins_loaded', array( $this, 'plugins_loaded' ), 9999 );
 		add_action( 'wp_loaded', array( $this, 'wp_loaded' ) );
 		add_filter( 'site_url', array( $this, 'site_url' ), 10, 4 );
 		add_filter( 'network_site_url', array( $this, 'network_site_url' ), 10, 3 );
 		add_filter( 'wp_redirect', array( $this, 'wp_redirect' ), 10, 2 );
 		add_action( 'template_redirect', array( $this, 'redirect_export_data' ) );
-//		add_filter( 'login_url', array( $this, 'login_url' ), 10, 3 );
-	}
-
-	/**
-	 * Send an e-mail with the correct login URL
-	 * @return void
-	 */
-	private function send_mail() {
-
-		// Prevent spam
-		if ( get_transient('rsssl_email_recently_sent') ) {
-			return;
-		}
-
-		$to = get_bloginfo('admin_email');
-		$subject = '<div>' . __("You can log in to your site via", "really-simple-ssl") . ' ' . site_url() . "</div>";
-		$body = trailingslashit( site_url() ) . $this->new_login_slug() ;
-		$headers = array('Content-Type: text/html; charset=UTF-8');
-		wp_mail( $to, $subject, $body, $headers );
-		set_transient('rsssl_email_recently_sent', true, 15 * MINUTE_IN_SECONDS );
+		add_filter( 'login_url', array( $this, 'login_url' ), 10, 3 );
 	}
 
 	/**
@@ -84,8 +75,8 @@ class rsssl_change_login_url {
 	 * @return string
 	 */
 	private function new_login_slug(): string {
-		return !empty(rsssl_get_option('change_login_url')) ? rsssl_get_option('change_login_url') : 'wplogin';
-	}
+		return ! empty( rsssl_get_option('change_login_url') ) ? rsssl_get_option('change_login_url') : 'wplogin';
+		}
 
 	/**
 	 * Redirect to 404
@@ -96,7 +87,7 @@ class rsssl_change_login_url {
 		$wp_query->set_404();
 		status_header( 404 );
 		get_template_part( 404 );
-		exit();
+		die();
 	}
 
 	/**
@@ -107,7 +98,7 @@ class rsssl_change_login_url {
 	public function new_login_url(): string {
 		$url = home_url();
 		if ( get_option( 'permalink_structure' ) ) {
-			return user_trailingslashit( $url . $this->new_login_slug() );
+			return trailingslashit( $url ) . $this->new_login_slug();
 		} else {
 			return $url . '?' . $this->new_login_slug();
 		}
@@ -145,7 +136,8 @@ class rsssl_change_login_url {
 		       || ( isset( $request['path'] ) && untrailingslashit( $request['path'] ) === site_url( 'wp-login', 'relative' ) ) )
 		     && ! is_admin() ) {
 			$this->wp_login_php = true;
-			$_SERVER['REQUEST_URI'] = user_trailingslashit( '/' . str_repeat( '-/', 10 ) );
+			$_SERVER['REQUEST_URI'] = $this->user_trailingslashit( '/' . str_repeat( '-/', 10 ) );
+
 			$pagenow = 'index.php';
 		} elseif ( ( isset( $request['path'] ) && untrailingslashit( $request['path'] ) === home_url( $this->new_login_slug(), 'relative' ) )
 		           || ( ! get_option( 'permalink_structure' )
@@ -158,7 +150,8 @@ class rsssl_change_login_url {
 		           && ! is_admin() ) {
 
 			$this->wp_login_php = true;
-			$_SERVER['REQUEST_URI'] = user_trailingslashit( '/' . str_repeat( '-/', 10 ) );
+			$_SERVER['REQUEST_URI'] = $this->user_trailingslashit( '/' . str_repeat( '-/', 10 ) );
+
 			$pagenow = 'index.php';
 		}
 	}
@@ -182,13 +175,13 @@ class rsssl_change_login_url {
 //			if ( ! is_user_logged_in() && isset( $_GET['wc-ajax'] ) && $pagenow === 'profile.php' ) {
 //				$this->redirect_to_404();
 //			}
-
+//
 //			if ( ! is_user_logged_in() && isset( $request['path'] ) && $request['path'] === '/wp-admin/options.php' ) {
 //				$this->redirect_to_404();
 //			}
 
-			if ( $pagenow === 'wp-login.php' && isset( $request['path'] ) && $request['path'] !== user_trailingslashit( $request['path'] ) && get_option( 'permalink_structure' ) ) {
-				wp_safe_redirect( user_trailingslashit( $this->new_login_url() ) . ( ! empty( $_SERVER['QUERY_STRING'] ) ? '?' . $_SERVER['QUERY_STRING'] : '' ) );
+			if ( $pagenow === 'wp-login.php' && isset( $request['path'] ) && $request['path'] !== $this->user_trailingslashit( $request['path'] ) && get_option( 'permalink_structure' ) ) {
+				wp_safe_redirect( $this->user_trailingslashit( $this->new_login_url() ) . ( ! empty( $_SERVER['QUERY_STRING'] ) ? '?' . $_SERVER['QUERY_STRING'] : '' ) );
 				die;
 			} elseif ( $this->wp_login_php ) {
 				if ( ( $referer = wp_get_referer() )
@@ -214,6 +207,9 @@ class rsssl_change_login_url {
 				$this->wp_template_loader();
 
 			} elseif ( $pagenow === 'wp-login.php' ) {
+				// These globals should be available on wp-login.php. Do not remove
+				global $error, $interim_login, $action, $user_login;
+
 				$redirect_to = admin_url();
 				$requested_redirect_to = '';
 				if ( isset( $_REQUEST['redirect_to'] ) ) {
@@ -223,7 +219,8 @@ class rsssl_change_login_url {
 				if ( is_user_logged_in() ) {
 					$user = wp_get_current_user();
 					if ( ! isset( $_REQUEST['action'] ) ) {
-						wp_safe_redirect( $requested_redirect_to );
+						$logged_in_redirect = apply_filters( 'whl_logged_in_redirect', $redirect_to, $requested_redirect_to, $user );
+						wp_safe_redirect( $logged_in_redirect );
 						die();
 					}
 				}
@@ -237,11 +234,11 @@ class rsssl_change_login_url {
 	/**
 	 * @param string   $url
 	 * @param string   $path
-	 * @param int|null $blog_id
+	 * @param          $blog_id
 	 *
 	 * @return string
 	 */
-	public function site_url( string $url, string $path, ?int $blog_id ): string {
+	public function site_url( string $url, string $path, $blog_id ): string {
 		return $this->filter_wp_login_php( $url );
 	}
 
@@ -251,7 +248,7 @@ class rsssl_change_login_url {
 	 *
 	 * @return string
 	 */
-	public function network_site_url( $url, $path ) {
+	public function network_site_url( $url, $path ): string {
 		return $this->filter_wp_login_php( $url );
 	}
 
@@ -267,6 +264,14 @@ class rsssl_change_login_url {
 		}
 
 		return $this->filter_wp_login_php( $location );
+	}
+
+	private function use_trailing_slashes() {
+		return ( '/' === substr( get_option( 'permalink_structure' ), - 1, 1 ) );
+	}
+
+	private function user_trailingslashit( $string ) {
+		return $this->use_trailing_slashes() ? trailingslashit( $string ) : untrailingslashit( $string );
 	}
 
 	/**
@@ -310,6 +315,7 @@ class rsssl_change_login_url {
 	 * @return string
 	 */
 	public function login_url( $login_url, $redirect, $force_reauth ) {
+
 		if ( is_404() ) {
 			return '#';
 		}
