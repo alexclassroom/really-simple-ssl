@@ -1,5 +1,10 @@
 .rsssl{
   div[class^="rsssl-wizard-"]{ // starts with selector
+
+    input[type="text"]:disabled {
+      background: var(--rsp-color-disabled);
+    }
+
     .components-flex{
       display: flex;
       flex-direction: row;

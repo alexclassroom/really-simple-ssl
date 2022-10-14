@@ -558,6 +558,7 @@ function rsssl_fields( $load_values = true ) {
 			'label'    => __( "Change login URL", 'really-simple-ssl' ),
 			'disabled' => false,
 			'default'  => false,
+			'placeholder'=> 'wplogin',
 			'react_conditions' => [
 				'relation' => 'AND',
 				[

@@ -153,6 +153,7 @@ class Field extends Component {
                   <TextControl
                       disabled = {disabled}
                       help={ field.comment }
+                      placeholder={ field.placeholder }
                       label={ field.label }
                       onChange={ ( fieldValue ) => this.onChangeHandler(fieldValue) }
                       value= { fieldValue }
