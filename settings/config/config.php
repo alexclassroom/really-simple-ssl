@@ -542,15 +542,6 @@ function rsssl_fields( $load_values = true ) {
 			'default'  => false,
 		],
 		[
-			'id'       => 'disable_wp_admin',
-			'menu_id'  => 'hardening',
-			'group_id' => 'hardening_basic',
-			'type'     => 'checkbox',
-			'label'    => __( "Disable login via /wp-admin/", 'really-simple-ssl' ),
-			'disabled' => false,
-			'default'  => false,
-		],
-		[
 			'id'       => 'disable_wp_login',
 			'menu_id'  => 'hardening',
 			'group_id' => 'hardening_basic',
@@ -567,6 +558,12 @@ function rsssl_fields( $load_values = true ) {
 			'label'    => __( "Change login URL", 'really-simple-ssl' ),
 			'disabled' => false,
 			'default'  => false,
+			'react_conditions' => [
+				'relation' => 'AND',
+				[
+					'disable_wp_login' => true,
+				]
+			],
 		],
 		[
 			'id'       => 'disable_http_methods',

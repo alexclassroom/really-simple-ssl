@@ -137,6 +137,7 @@ class Field extends Component {
             return (
                 <div className={this.highLightClass}>
                   <RadioControl
+                      disabled = {disabled}
                       label={ field.label }
                       onChange={ ( fieldValue ) => this.onChangeHandler(fieldValue) }
                       selected={ fieldValue }
@@ -150,6 +151,7 @@ class Field extends Component {
             return (
                 <div className={this.highLightClass}>
                   <TextControl
+                      disabled = {disabled}
                       help={ field.comment }
                       label={ field.label }
                       onChange={ ( fieldValue ) => this.onChangeHandler(fieldValue) }

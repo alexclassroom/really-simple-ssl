@@ -72,7 +72,6 @@ $rsssl_integrations_list = apply_filters( 'rsssl_integrations', array(
 		'impact'               => 'high',
 		'risk'                 => 'medium',
 		'option_id'            => 'change_login_url',
-	    'always_include'       => true,
 	),
 
 	'display-name-is-login-name' => array(
