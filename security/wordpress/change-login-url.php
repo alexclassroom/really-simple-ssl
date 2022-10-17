@@ -164,25 +164,45 @@ class rsssl_change_login_url {
 	public function wp_loaded() {
 		global $pagenow;
 		$request = parse_url( rawurldecode( $_SERVER['REQUEST_URI'] ) );
-		if ( ! ( isset( $_GET['action'] ) && $_GET['action'] === 'postpass' && isset( $_POST['post_password'] ) ) ) {
+
+		if ( $pagenow === 'wp-login.php' ) {
+			// These globals should be available on wp-login.php. Do not remove
+			global $error, $interim_login, $action, $user_login;
+
+			$redirect_to = admin_url();
+			$requested_redirect_to = '';
+			if ( isset( $_REQUEST['redirect_to'] ) ) {
+				$requested_redirect_to = $_REQUEST['redirect_to'];
+			}
+
+			if ( is_user_logged_in() ) {
+				$user = wp_get_current_user();
+				if ( ! isset( $_REQUEST['action'] ) ) {
+					wp_safe_redirect( $redirect_to );
+					die();
+				}
+			}
+
+			@require_once ABSPATH . 'wp-login.php';
+			die;
+		} elseif ( ! ( isset( $_GET['action'] ) && $_GET['action'] === 'postpass' && isset( $_POST['post_password'] ) ) ) {
 
 			if ( is_admin() && ! is_user_logged_in() && ! defined( 'WP_CLI' ) && ! defined( 'DOING_AJAX' ) && ! defined( 'DOING_CRON' ) && $pagenow !== 'admin-post.php'
-//			     && $request['path'] !== '/wp-admin/options.php'
 			) {
 				$this->redirect_to_404();
 			}
 
-//			if ( ! is_user_logged_in() && isset( $_GET['wc-ajax'] ) && $pagenow === 'profile.php' ) {
-//				$this->redirect_to_404();
-//			}
-//
-//			if ( ! is_user_logged_in() && isset( $request['path'] ) && $request['path'] === '/wp-admin/options.php' ) {
-//				$this->redirect_to_404();
-//			}
+			if ( ! is_user_logged_in() && isset( $_GET['wc-ajax'] ) && $pagenow === 'profile.php' ) {
+				$this->redirect_to_404();
+			}
+
+			if ( ! is_user_logged_in() && isset( $request['path'] ) && $request['path'] === '/wp-admin/options.php' ) {
+				$this->redirect_to_404();
+			}
 
 			if ( $pagenow === 'wp-login.php' && isset( $request['path'] ) && $request['path'] !== $this->user_trailingslashit( $request['path'] ) && get_option( 'permalink_structure' ) ) {
 				wp_safe_redirect( $this->user_trailingslashit( $this->new_login_url() ) . ( ! empty( $_SERVER['QUERY_STRING'] ) ? '?' . $_SERVER['QUERY_STRING'] : '' ) );
-				die;
+				die();
 			} elseif ( $this->wp_login_php ) {
 				if ( ( $referer = wp_get_referer() )
 				     && strpos( $referer, 'wp-activate.php' ) !== false
@@ -206,27 +226,6 @@ class rsssl_change_login_url {
 
 				$this->wp_template_loader();
 
-			} elseif ( $pagenow === 'wp-login.php' ) {
-				// These globals should be available on wp-login.php. Do not remove
-				global $error, $interim_login, $action, $user_login;
-
-				$redirect_to = admin_url();
-				$requested_redirect_to = '';
-				if ( isset( $_REQUEST['redirect_to'] ) ) {
-					$requested_redirect_to = $_REQUEST['redirect_to'];
-				}
-
-				if ( is_user_logged_in() ) {
-					$user = wp_get_current_user();
-					if ( ! isset( $_REQUEST['action'] ) ) {
-						$logged_in_redirect = apply_filters( 'whl_logged_in_redirect', $redirect_to, $requested_redirect_to, $user );
-						wp_safe_redirect( $logged_in_redirect );
-						die();
-					}
-				}
-
-				@require_once ABSPATH . 'wp-login.php';
-				die;
 			}
 		}
 	}
