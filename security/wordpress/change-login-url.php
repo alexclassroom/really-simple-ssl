@@ -6,12 +6,8 @@ class rsssl_change_login_url {
 
 	function __construct() {
 
-//		if ( ! $this->test_new_login_success() ) {
-//			return;
-//		}
-
 		//send login mail if user uses this parameter
-		if ( isset($GET['rssslgetlogin'] ) ) {
+		if ( isset( $GET['rssslgetlogin'] ) ) {
 
 			$args = [
 				'to' => get_bloginfo('admin_email'),
@@ -51,6 +47,18 @@ class rsssl_change_login_url {
 	}
 
 	/**
+	 * Detect known plugins which change WordPress login
+	 * @return void
+	 */
+	public function detect_login_plugins() {
+
+		$plugins = [];
+
+
+
+	}
+
+	/**
 	 * initialize the template loader
 	 *
 	 * @return void
@@ -76,7 +84,7 @@ class rsssl_change_login_url {
 	 */
 	private function new_login_slug(): string {
 		return ! empty( rsssl_get_option('change_login_url') ) ? rsssl_get_option('change_login_url') : 'wplogin';
-		}
+	}
 
 	/**
 	 * Redirect to 404
@@ -112,8 +120,8 @@ class rsssl_change_login_url {
 			if ( ! is_wp_error( $result ) ) {
 				wp_redirect( add_query_arg( array(
 					'action'      => 'confirmaction',
-					'request_id'  => $_GET['request_id'],
-					'confirm_key' => $_GET['confirm_key']
+					'request_id'  => $request_id,
+					'confirm_key' => $key,
 				), $this->new_login_url()
 				) );
 				exit();
@@ -122,13 +130,13 @@ class rsssl_change_login_url {
 	}
 
 	public function plugins_loaded() {
+
 		global $pagenow;
 		if ( ! is_multisite()
 		     && ( strpos( rawurldecode( $_SERVER['REQUEST_URI'] ), 'wp-signup' ) !== false
 		          || strpos( rawurldecode( $_SERVER['REQUEST_URI'] ), 'wp-activate' ) !== false ) ) {
 
 			wp_die( __( 'This feature is not enabled.', 'wps-hide-login' ) );
-
 		}
 
 		$request = parse_url( rawurldecode( $_SERVER['REQUEST_URI'] ) );
@@ -136,7 +144,7 @@ class rsssl_change_login_url {
 		       || ( isset( $request['path'] ) && untrailingslashit( $request['path'] ) === site_url( 'wp-login', 'relative' ) ) )
 		     && ! is_admin() ) {
 			$this->wp_login_php = true;
-			$_SERVER['REQUEST_URI'] = $this->user_trailingslashit( '/' . str_repeat( '-/', 10 ) );
+//			$_SERVER['REQUEST_URI'] = $this->user_trailingslashit( '/' . str_repeat( '-/', 10 ) );
 
 			$pagenow = 'index.php';
 		} elseif ( ( isset( $request['path'] ) && untrailingslashit( $request['path'] ) === home_url( $this->new_login_slug(), 'relative' ) )
@@ -150,7 +158,7 @@ class rsssl_change_login_url {
 		           && ! is_admin() ) {
 
 			$this->wp_login_php = true;
-			$_SERVER['REQUEST_URI'] = $this->user_trailingslashit( '/' . str_repeat( '-/', 10 ) );
+//			$_SERVER['REQUEST_URI'] = $this->user_trailingslashit( '/' . str_repeat( '-/', 10 ) );
 
 			$pagenow = 'index.php';
 		}
@@ -189,10 +197,6 @@ class rsssl_change_login_url {
 
 			if ( is_admin() && ! is_user_logged_in() && ! defined( 'WP_CLI' ) && ! defined( 'DOING_AJAX' ) && ! defined( 'DOING_CRON' ) && $pagenow !== 'admin-post.php'
 			) {
-				$this->redirect_to_404();
-			}
-
-			if ( ! is_user_logged_in() && isset( $_GET['wc-ajax'] ) && $pagenow === 'profile.php' ) {
 				$this->redirect_to_404();
 			}
 

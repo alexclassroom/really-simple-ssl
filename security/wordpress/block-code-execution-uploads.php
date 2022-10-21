@@ -68,8 +68,6 @@ function rsssl_disable_code_execution_rules($rules)
 }
 add_filter('rsssl_htaccess_security_rules_uploads', 'rsssl_disable_code_execution_rules');
 
-
-
 function rsssl_get_nginx_code_code_execution_uploads() {
     $code = '<code>location ~* /uploads/.*\.php$ {' . "<br>";
     $code .= '&nbsp;&nbsp;&nbsp;&nbsp;return 503;' . "<br>";

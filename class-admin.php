@@ -123,6 +123,7 @@ class rsssl_admin
 	    if ( defined("rsssl_pro_version" ) ) {
             return false;
         }
+
 	    $start_day = 22;
         $end_day = 29;
 	    $current_year = date("Y");//e.g. 2021
