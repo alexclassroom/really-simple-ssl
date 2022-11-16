@@ -77,6 +77,11 @@ class rsssl_firewall_manager {
 		$contents .= '* This file is created by Really Simple SSL' . "\n";
 		$contents .= '*/' . "\n\n";
 		$contents .= "defined('ABSPATH') or die();" . "\n\n";
+		$contents .= "if ( defined('RSSSL_ADVANCED_HEADERS') ) {" . "\n\n";
+		$contents .= "    return;" . "\n\n";
+		$contents .= "} else {" . "\n\n";
+		$contents .= "    define('RSSSL_ADVANCED_HEADERS', true);" . "\n\n";
+		$contents .= "}" . "\n\n";
 		//allow disabling of headers for detection purposes
 		$contents .= 'if ( isset($_GET["rsssl_header_test"]) && (int) $_GET["rsssl_header_test"] ===  ' . $this->get_headers_nonce() . ' ) return;' . "\n\n";
 		$contents .= "//RULES START\n".$rules;

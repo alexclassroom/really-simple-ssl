@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Really Simple SSL
- * Plugin URI: https://really-simple-ssl.com
+ * Plugin URI: https://www.wordpress.org/plugins/really-simple-ssl
  * Description: Lightweight SSL & Hardening Plugin
  * Version: 6.0.10
  * Author: Really Simple Plugins
