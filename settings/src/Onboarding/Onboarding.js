@@ -123,20 +123,18 @@ const [networkProgress, setNetworkProgress] = useState(0);
 
     const itemButtonHandler = (id, action) => {
         let data={};
-        data.action = action;
         data.id = id;
         updateActionForItem(id, action, false);
-        rsssl_api.onboardingActions(data).then( ( response ) => {
+        rsssl_api.doAction(action, data).then( ( response ) => {
             if ( response.data.success ){
                 if (action==='activate_setting'){
                     //ensure all fields are updated, and progress is retrieved again
                     props.getFields();
                 }
                 let nextAction = response.data.next_action;
-                if (nextAction!=='none') {
-                    data.action = nextAction;
+                if ( nextAction!=='none' && nextAction!=='completed') {
                     updateActionForItem(id, nextAction, false);
-                    rsssl_api.onboardingActions(data).then( ( response ) => {
+                    rsssl_api.doAction(nextAction, data).then( ( response ) => {
                         if ( response.data.success ){
                             updateActionForItem(id, 'completed', 'success' );
                         } else {
@@ -242,7 +240,7 @@ const [networkProgress, setNetworkProgress] = useState(0);
 
     const controlButtons = () => {
         let ActivateSSLText = networkwide ? __("Activate SSL networkwide", "really-simple-ssl") : __("Activate SSL", "really-simple-ssl");
-        if (steps[0].visible) {
+        if (steps[0].visible && steps.length > 1) {
            return (
                 <>
                 <button disabled={!certificateValid && !overrideSSL} className="button button-primary" onClick={() => {activateSSL()}}>{ActivateSSLText}</button>
@@ -264,14 +262,13 @@ const [networkProgress, setNetworkProgress] = useState(0);
             );
         }
 
-        if (steps[1].visible){
+        if ( ( steps.length>1 && steps[1].visible ) || steps[0].visible){
             return (
                 <>
                 <button className="button button-primary" onClick={() => {goToDashboard()}}>{__('Go to Dashboard', 'really-simple-ssl')}</button>
                 <button className="button button-default" onClick={() => {props.dismissModal()}}>{__('Dismiss', 'really-simple-ssl')}</button>
                 </>
             );
-
         }
     }
 
