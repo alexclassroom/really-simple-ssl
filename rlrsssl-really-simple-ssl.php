@@ -280,7 +280,11 @@ if ( !function_exists('rsssl_is_logged_in_rest')){
         }
         error_log("Detected valid rest request");
         $logged_in = is_user_logged_in();
-        error_log("logged in status $logged_in");
+        if (!$logged_in) {
+	        error_log("Not logged in, block request");
+        } else {
+	        error_log("logged in, allow request");
+        }
         return $logged_in;
 	}
 }
