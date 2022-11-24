@@ -274,8 +274,11 @@ add_action('plugins_loaded', 'RSSSL', 8);
 
 if ( !function_exists('rsssl_is_logged_in_rest')){
 	function rsssl_is_logged_in_rest(){
+        error_log("is logged in rest check");
 		$valid_request = isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], '/reallysimplessl/v1/')!==false;
         if ( !$valid_request ) {
+            error_log("SERVER variable");
+            error_log(print_r($_SERVER,true));
             return false;
         }
         error_log("Detected valid rest request");
