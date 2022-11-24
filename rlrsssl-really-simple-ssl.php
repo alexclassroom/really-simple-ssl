@@ -278,6 +278,9 @@ if ( !function_exists('rsssl_is_logged_in_rest')){
         if ( !$valid_request ) {
             return false;
         }
-        return is_user_logged_in();
+        error_log("Detected valid rest request");
+        $logged_in = is_user_logged_in();
+        error_log("logged in status $logged_in");
+        return $logged_in;
 	}
 }
