@@ -2315,11 +2315,6 @@ class rsssl_admin
             if ( isset($notices[$id]) ) {
 	            $notices[$id]['output']['label'] = $icon_labels[ $notices[$id]['output']['icon'] ];
             }
-
-            //only remove this option if it's both dismissed AND not completed. This way we keep completed notices in the list.
-		    if ( isset($notices[$id]) && get_option( "rsssl_" . $id . "_dismissed" ) && $notices[$id]['output']['status'] !== 'completed') {
-			    unset($notices[$id]);
-		    }
 	    }
 
         //if only admin_notices are required, filter out the rest.
@@ -2333,6 +2328,14 @@ class rsssl_admin
 		    $cache_notices = empty($notices) ? 'empty' : $notices;
 		    set_transient('rsssl_admin_notices', $cache_notices, WEEK_IN_SECONDS );
         }
+
+	    #if a notice is dismissed, mark it as completed.
+	    foreach ( $notices as $id => $notice ) {
+		    if ( isset($notices[$id]) && get_option( "rsssl_" . $id . "_dismissed" ) ) {
+			    $notices[$id]['output']['status'] = 'dismissed';
+                //x_log($notices);
+		    }
+	    }
 
 	    //sort so warnings are on top
 	    $warnings = array();
