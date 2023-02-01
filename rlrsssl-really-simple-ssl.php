@@ -3,7 +3,7 @@
  * Plugin Name: Really Simple SSL
  * Plugin URI: https://really-simple-ssl.com
  * Description: Lightweight SSL & Hardening Plugin
- * Version: 6.1.1
+ * Version: 6.2.0
  * Author: Really Simple Plugins
  * Author URI: https://really-simple-plugins.com
  * License: GPL2
@@ -110,7 +110,7 @@ class REALLY_SIMPLE_SSL
         if (!defined('rsssl_file') ){
             define('rsssl_file', __FILE__);
         }
-		define('rsssl_version', '6.1.1');
+		define('rsssl_version', '6.2.0');
 		define('rsssl_le_cron_generation_renewal_check', 20);
 		define('rsssl_le_manual_generation_renewal_check', 15);
 	}
@@ -140,6 +140,7 @@ class REALLY_SIMPLE_SSL
             require_once( rsssl_path . 'progress/class-progress.php');
 			require_once( rsssl_path . 'class-certificate.php');
 			require_once( rsssl_path . 'class-site-health.php');
+			require_once( rsssl_path . 'mailer/class-mail.php');
 			if ( isset($_GET['install_pro'])) {
 				require_once( rsssl_path . 'upgrade/upgrade-to-pro.php');
 			}
