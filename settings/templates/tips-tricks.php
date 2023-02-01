@@ -2,27 +2,27 @@
 $items = array(
 	1 => array(
 		'content' => "Definition: What is a Content Security Policy?",
-		'link'    => 'https://really-simple-ssl.com/definition/What-is-a-Content-Security-Policy/',
+		'link'    => 'https://really-simple-ssl.com/definition/What-is-a-Content-Security-Policy/?mtm_campaign=dashboard&mtm_source=free&mtm_medium=tipstricks&mtm_content=csp',
 	),
 	2 => array(
 		'content' => "Installing a Let's Encrypt certificate",
-		'link'    => 'https://really-simple-ssl.com/install-ssl-certificate/',
+		'link'    => 'https://really-simple-ssl.com/install-ssl-certificate/?mtm_campaign=dashboard&mtm_source=free&mtm_medium=tipstricks&mtm_content=letsencrypt',
 	),
 	3 => array(
 		'content' => "Improve Security: (HSTS) HTTP Strict Transport Security",
-		'link'    => 'https://really-simple-ssl.com/instructions/about-hsts/',
+		'link'    => 'https://really-simple-ssl.com/instructions/about-hsts/?mtm_campaign=dashboard&mtm_source=free&mtm_medium=tipstricks&mtm_content=hsts',
 	),
 	4 => array(
 		'content' => "Improve Security: Advanced Hardening",
-		'link'    => 'https://really-simple-ssl.com/instructions/about-hardening-features#advanced',
+		'link'    => 'https://really-simple-ssl.com/instructions/about-hardening-features/?mtm_campaign=dashboard&mtm_source=free&mtm_medium=tipstricks&mtm_content=advancedhardening',
 	),
 	5 => array(
 		'content' => "Instructions: Debugging with Really Simple SSL",
-		'link'    => 'https://really-simple-ssl.com/instructions/debugging/',
+		'link'    => 'https://really-simple-ssl.com/instructions/debugging/?mtm_campaign=dashboard&mtm_source=free&mtm_medium=tipstricks&mtm_content=debugging',
 	),
 	6 => array(
 		'content' => "Instructions: Configuring Hardening Features",
-		'link'    => 'https://really-simple-ssl.com/instructions/about-hardening-features/',
+		'link'    => 'https://really-simple-ssl.com/instructions/about-hardening-features/?mtm_campaign=dashboard&mtm_source=free&mtm_medium=tipstricks&mtm_content=hardening',
 	),
 );
 

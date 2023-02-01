@@ -559,7 +559,7 @@ function rsssl_fields( $load_values = true ) {
 			'email'            => [
 				'title'   => __( "Settings update: Username 'admin' renamed", 'really-simple-ssl' ),
 				'message' => sprintf(__( "As a security precaution, the username ‘admin’ has been changed on %s. From now on, you can login with '%s' or an email address.", 'really-simple-ssl' ), '{site_url}','{username}'),
-				'url'     => 'https://really-simple-ssl.com/instructions/locked-our-after-renaming-the-admin-username/',
+				'url'     => 'https://really-simple-ssl.com/instructions/locked-our-after-renaming-the-admin-username/?mtm_campaign=email&mtm_source=free',
 			],
 			'tooltip'            => __( "If the username 'admin' currenlty exists, you can rename it here. Please note that you can no longer use this username, and should use the new username or an email address",
 				'really-simple-ssl' ),
@@ -630,7 +630,7 @@ function rsssl_fields( $load_values = true ) {
 			'email'            => [
 				'title'   => __( "Settings update: Database prefix changed", 'really-simple-ssl' ),
 				'message' => __( "Security through obscurity. Your site is no longer using the default wp_ prefix for database tables. The process has been designed to only complete and replace the tables after all wp_ tables are successfully renamed. In the unlikely event that this does lead to database issues on your site, please navigate to our troubleshooting article.", 'really-simple-ssl' ),
-				'url'     => 'https://really-simple-ssl.com/locked-out-after-renaming-admin-user/',
+				'url'     => 'https://really-simple-ssl.com/locked-out-after-renaming-admin-user/?mtm_campaign=email&mtm_source=free',
 			],
 			'tooltip'  => __( "This will permanently change your database prefixes and you can NOT rollback this feature. Please make sure you have a back-up.", 'really-simple-ssl' ),
 			'warning'     => true,
@@ -648,7 +648,7 @@ function rsssl_fields( $load_values = true ) {
 			'email'            => [
 				'title'   => __( "Settings update: Debug.log file relocated", 'really-simple-ssl' ),
 				'message' => __( "From now on, the debug.log won’t be publicly accessible whenever wp-debugging is enabled. The debug log will be stored in a randomly named folder in /wp-content/. This prevents possible leakage of sensitive debugging information.", 'really-simple-ssl' ),
-				'url'     => 'https://really-simple-ssl.com/instructions/debug-log-has-been-relocated-but-where/',
+				'url'     => 'https://really-simple-ssl.com/instructions/debug-log-has-been-relocated-but-where/?mtm_campaign=email&mtm_source=free',
 			],
 			'label'              => __( "Change debug.log file location", 'really-simple-ssl' ),
 			'disabled'           => false,

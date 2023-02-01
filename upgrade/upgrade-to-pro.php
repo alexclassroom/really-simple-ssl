@@ -48,8 +48,8 @@ if ( !class_exists('rsp_upgrade_to_pro') ){
 						$this->prefix = "rsssl_";
 						$this->api_url = "https://really-simple-ssl.com";
 						$this->dashboard_url = add_query_arg(["page" => "really-simple-security"], $rsssl_admin_url );
-						$this->account_url = 'https://really-simple-ssl.com/account';
-						$this->instructions = 'https://really-simple-ssl.com/knowledge-base/install-really-simple-ssl-pro';
+						$this->account_url = 'https://really-simple-ssl.com/account?mtm_campaign=dashboard&mtm_source=free&mtm_medium=plugins&mtm_content=account';
+						$this->instructions = 'https://really-simple-ssl.com/knowledge-base/install-really-simple-ssl-pro?mtm_campaign=dashboard&mtm_source=free&mtm_medium=plugins&mtm_content=installpro';
 						break;
 					case "brst_pro":
 						$this->slug = "burst";
@@ -58,8 +58,8 @@ if ( !class_exists('rsp_upgrade_to_pro') ){
 						$this->prefix = "burst_";
 						$this->api_url = "https://burst-statistics.com";
 						$this->dashboard_url = add_query_arg(["page" => "burst"], admin_url( "admin.php" ));
-						$this->account_url = 'https://burst-statistics.com/account';
-						$this->instructions = 'https://burst-statistics.com/how-to-install-burst-premium';
+						$this->account_url = 'https://burst-statistics.com/account?mtm_campaign=dashboard&mtm_source=free&mtm_medium=plugins&mtm_content=account';
+						$this->instructions = 'https://burst-statistics.com/how-to-install-burst-premium?mtm_campaign=dashboard&mtm_source=free&mtm_medium=plugins&mtm_content=burst';
 						break;
 					case "cmplz_pro":
 					default:
@@ -69,8 +69,8 @@ if ( !class_exists('rsp_upgrade_to_pro') ){
 						$this->prefix = "cmplz_";
 						$this->api_url = "https://complianz.io";
 						$this->dashboard_url = add_query_arg(["page" => "complianz"], admin_url("admin.php") );
-                        $this->account_url = 'https://complianz.io/account';
-                        $this->instructions = 'https://complianz.io/how-to-install-complianz-gdpr-premium-plugin';
+                        $this->account_url = 'https://complianz.io/account?mtm_campaign=dashboard&mtm_source=free&mtm_medium=plugins&mtm_content=cmplzaccount';
+                        $this->instructions = 'https://complianz.io/how-to-install-complianz-gdpr-premium-plugin?mtm_campaign=dashboard&mtm_source=free&mtm_medium=plugins&mtm_content=installcmplzpro';
 						break;
 				}
 			}
