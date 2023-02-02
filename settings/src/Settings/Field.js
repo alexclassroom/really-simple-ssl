@@ -59,7 +59,7 @@ const Field = (props) => {
      * @param type
      */
     const onChangeHandlerDataTableStatus = (enabled, clickedItem, type ) => {
-        let field=props.field;
+        let field={...props.field};
         enabled = enabled==1 ? 0 : 1;
         if (typeof field.value === 'object') {
             field.value = Object.values(field.value);
@@ -69,10 +69,13 @@ const Field = (props) => {
             if (item.id === clickedItem.id) {
                 item[type] = enabled;
             }
-            delete item.valueControl;
-            delete item.statusControl;
-            delete item.deleteControl;
         }
+
+        //All data elements with 'Control' in the name are dropped, to prevent:
+        field.value = field.value.map(item => {
+            const { deleteControl, statusControl, valueControl, ...rest } = item;
+            return rest;
+        });
         //the updateItemId allows us to update one specific item in a field set.
         field.updateItemId = clickedItem.id;
         let saveFields = [];
