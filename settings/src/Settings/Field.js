@@ -59,7 +59,7 @@ const Field = (props) => {
      * @param type
      */
     const onChangeHandlerDataTableStatus = (enabled, clickedItem, type ) => {
-        let field={...props.field};
+        let field=props.field;
         enabled = enabled==1 ? 0 : 1;
         if (typeof field.value === 'object') {
             field.value = Object.values(field.value);
