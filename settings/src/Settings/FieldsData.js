@@ -219,12 +219,15 @@ const updateFieldsListWithConditions = (fields) => {
     return newFields;
 }
 
-const handleShowSavedSettingsNotice = (text) => {
+const handleShowSavedSettingsNotice = (text, status) => {
     if (typeof text === 'undefined') {
         text = __( 'Settings Saved', 'really-simple-ssl' );
     }
+    if (typeof status === 'undefined') {
+        status = 'success';
+    }
     dispatch('core/notices').createNotice(
-        'success',
+        status,
         text,
         {
             __unstableHTML: true,

@@ -19240,11 +19240,14 @@ const updateFieldsListWithConditions = fields => {
   });
   return newFields;
 };
-const handleShowSavedSettingsNotice = text => {
+const handleShowSavedSettingsNotice = (text, status) => {
   if (typeof text === 'undefined') {
     text = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_2__.__)('Settings Saved', 'really-simple-ssl');
   }
-  (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.dispatch)('core/notices').createNotice('success', text, {
+  if (typeof status === 'undefined') {
+    status = 'success';
+  }
+  (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_3__.dispatch)('core/notices').createNotice(status, text, {
     __unstableHTML: true,
     id: 'rsssl_settings_saved',
     type: 'snackbar',
@@ -20643,12 +20646,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_data_table_component__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-data-table-component */ "./node_modules/react-data-table-component/dist/index.cjs.js");
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _utils_sleeper__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../utils/sleeper */ "./src/utils/sleeper.js");
-/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
-/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_6__);
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_7__);
-
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _FieldsData__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../FieldsData */ "./src/Settings/FieldsData.js");
 
 
 
@@ -20662,16 +20662,35 @@ const RiskComponent = props => {
     riskData,
     dataLoaded,
     fetchRiskData,
-    setData,
     updateRiskData
   } = (0,_RiskData__WEBPACK_IMPORTED_MODULE_2__["default"])();
+  const {
+    showSavedSettingsNotice
+  } = (0,_FieldsData__WEBPACK_IMPORTED_MODULE_6__["default"])();
   (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
     fetchRiskData();
   }, []);
+  const buildColumn = column => {
+    return {
+      name: column.name,
+      sortable: column.sortable,
+      width: column.width,
+      selector: row => row[column.column],
+      grow: column.grow
+    };
+  };
+  const onChangeHandler = (fieldValue, item) => {
+    let msg = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_5__.__)('Measure was set for %s', 'really-simple-ssl').replace('%s', item.risk);
+    updateRiskData(item.id, fieldValue).then(response => {
+      showSavedSettingsNotice(msg, 'success');
+    }).then(response => {
+      showSavedSettingsNotice(msg, 'error');
+    });
+  };
 
   //we only proceed if the data is loaded
   if (!dataLoaded) {
-    return null;
+    return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null);
   }
 
   //we create the columns
@@ -20714,34 +20733,6 @@ const RiskComponent = props => {
     columns: columns,
     data: Object.values(riskData)
   }));
-  function buildColumn(column) {
-    return {
-      name: column.name,
-      sortable: column.sortable,
-      width: column.width,
-      selector: row => row[column.column],
-      grow: column.grow
-    };
-  }
-  function dispachNotification(risk, type) {
-    let text = (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_7__.__)('Measure was set for ' + risk, 'really-simple-ssl');
-    (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_6__.dispatch)('core/notices').createNotice(type, text, {
-      __unstableHTML: true,
-      id: 'rsssl_settings_saved',
-      type: 'snackbar',
-      isDismissible: false
-    }).then((0,_utils_sleeper__WEBPACK_IMPORTED_MODULE_5__["default"])(2000)).then(response => {
-      (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_6__.dispatch)('core/notices').removeNotice('rsssl_settings_saved');
-    });
-  }
-  function onChangeHandler(fieldValue, item) {
-    updateRiskData(item.id, fieldValue).then(response => {
-      dispachNotification(item.risk, 'success');
-    }).then(response => {
-      dispachNotification(item.risk, 'error');
-    });
-    ;
-  }
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (RiskComponent);
 
@@ -20758,15 +20749,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var zustand__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! zustand */ "./node_modules/zustand/esm/index.mjs");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
-/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _utils_api__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils/api */ "./src/utils/api.js");
+/* harmony import */ var zustand__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! zustand */ "./node_modules/zustand/esm/index.mjs");
+/* harmony import */ var _utils_api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/api */ "./src/utils/api.js");
 /* Creates A Store For Risk Data using Zustand */
 
 
-
-const UseRiskData = (0,zustand__WEBPACK_IMPORTED_MODULE_2__.create)((set, get) => ({
+const UseRiskData = (0,zustand__WEBPACK_IMPORTED_MODULE_1__.create)((set, get) => ({
   riskData: [],
   dataLoaded: false,
   setData: data => set({
@@ -20778,7 +20766,7 @@ const UseRiskData = (0,zustand__WEBPACK_IMPORTED_MODULE_2__.create)((set, get) =
     let data = {};
     data.risk_action = 'get';
     try {
-      const riskData = await _utils_api__WEBPACK_IMPORTED_MODULE_1__.doAction('risk_vulnerabilities_data', data);
+      const riskData = await _utils_api__WEBPACK_IMPORTED_MODULE_0__.doAction('risk_vulnerabilities_data', data);
       //we convert the data to an array
       set({
         riskData: riskData,
@@ -20791,7 +20779,7 @@ const UseRiskData = (0,zustand__WEBPACK_IMPORTED_MODULE_2__.create)((set, get) =
   //update Risk Data
   updateRiskData: async (field, value) => {
     try {
-      const riskData = await _utils_api__WEBPACK_IMPORTED_MODULE_1__.doAction('risk_vulnerabilities_data_save', {
+      const riskData = await _utils_api__WEBPACK_IMPORTED_MODULE_0__.doAction('risk_vulnerabilities_data_save', {
         field: field,
         value: value
       });

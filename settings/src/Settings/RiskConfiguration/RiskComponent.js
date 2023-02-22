@@ -2,13 +2,13 @@ import React, {useEffect} from 'react';
 import UseRiskData from "./RiskData";
 import DataTable from 'react-data-table-component';
 import {SelectControl} from "@wordpress/components";
-import sleeper from "../../utils/sleeper";
-import {dispatch} from '@wordpress/data';
 import {__} from "@wordpress/i18n";
+import useFields from "../FieldsData";
 
 const RiskComponent = (props) => {
     //first we put the data in a state
-    const {riskData, dataLoaded, fetchRiskData, setData, updateRiskData} = UseRiskData();
+    const {riskData, dataLoaded, fetchRiskData, updateRiskData} = UseRiskData();
+    const {showSavedSettingsNotice} = useFields();
 
     useEffect(() => {
         fetchRiskData();
@@ -24,30 +24,13 @@ const RiskComponent = (props) => {
         };
     }
 
-    const dispachNotification = ( risk, type ) => {
-        let text = __( 'Measure was set for ' + risk, 'really-simple-ssl' );
-        dispatch('core/notices').createNotice(
-            type,
-            text,
-            {
-                __unstableHTML: true,
-                id: 'rsssl_settings_saved',
-                type: 'snackbar',
-                isDismissible: false,
-            }
-        ).then(sleeper(2000)).then(( response ) => {
-            dispatch('core/notices').removeNotice('rsssl_settings_saved');
-        });
-    }
-
     const onChangeHandler = (fieldValue, item) => {
+        let msg = __( 'Measure was set for %s', 'really-simple-ssl' ).replace('%s', item.risk);
         updateRiskData(item.id, fieldValue).then((response) => {
-            dispachNotification(item.risk, 'success');
-        })
-            .then((response) => {
-                dispachNotification(item.risk, 'error');
-            });
-
+            showSavedSettingsNotice(msg, 'success');
+        }).then((response) => {
+            showSavedSettingsNotice(msg, 'error');
+        });
     }
 
     //we only proceed if the data is loaded

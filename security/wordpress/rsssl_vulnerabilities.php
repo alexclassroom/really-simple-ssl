@@ -107,6 +107,10 @@ if (!class_exists("rsssl_vulnerabilities")) {
          */
         public function get_vulnerabilities()
         {
+			if ( !rsssl_user_can_manage() ) {
+				return;
+			}
+
             //we loop through the plugins and check if there are any vulnerabilities. and place a notice
             foreach ($this->workable_plugins as $plugin) {
                 if (isset($plugin['vulnerable']) && $plugin['vulnerable']) {
@@ -198,6 +202,10 @@ if (!class_exists("rsssl_vulnerabilities")) {
          */
         public function add_vulnerability_column($columns)
         {
+	        if ( !rsssl_user_can_manage() ) {
+		        return $columns;
+	        }
+
             $columns['vulnerability'] = __('Notifications', 'really-simple-ssl');
             return $columns;
         }
@@ -261,6 +269,10 @@ if (!class_exists("rsssl_vulnerabilities")) {
          */
         public function add_vulnerability_styles($hook)
         {
+			if ( !rsssl_user_can_manage() ) {
+				return;
+			}
+
             if ('plugins.php' !== $hook) {
                 return;
             }
@@ -281,6 +293,10 @@ if (!class_exists("rsssl_vulnerabilities")) {
          */
         public function check_files()
         {
+	        if ( !rsssl_user_can_manage() ) {
+		        return;
+	        }
+
             //We check the core vulnerabilities and validate age and existence
             if (!$this->validate_local_file(true)) {
                 $this->download_core_vulnerabilities();
@@ -345,6 +361,10 @@ if (!class_exists("rsssl_vulnerabilities")) {
          */
         protected function download_core_vulnerabilities(): void
         {
+	        if ( !rsssl_user_can_manage() ) {
+		        return;
+	        }
+
             global $wp_version;
             $wp_version = '6.0.1'; //TODO: remove this line before release
             $url = self::RSS_SECURITY_API . 'core/wp-core_' . $wp_version . '.json';
@@ -364,6 +384,9 @@ if (!class_exists("rsssl_vulnerabilities")) {
          */
         protected function download_plugin_vulnerabilities(): void
         {
+	        if ( !rsssl_user_can_manage() ) {
+		        return;
+	        }
             //we get all the installed plugins
             $installed_plugins = get_plugins();
             $vulnerabilities = [];
@@ -408,6 +431,9 @@ if (!class_exists("rsssl_vulnerabilities")) {
          */
         private function store_file($data, bool $isCore = false): void
         {
+	        if ( !rsssl_user_can_manage() ) {
+		        return;
+	        }
             //if the data is empty, we return null
             if (empty($data)) {
                 return;
@@ -439,6 +465,10 @@ if (!class_exists("rsssl_vulnerabilities")) {
          */
         private function get_components()
         {
+	        if ( !rsssl_user_can_manage() ) {
+		        return;
+	        }
+
             $upload_dir = wp_upload_dir();
             $upload_dir = $upload_dir['basedir'];
             $upload_dir = $upload_dir . '/rsssl';
@@ -588,6 +618,9 @@ if (!class_exists("rsssl_vulnerabilities")) {
          */
         private function enable_feedback_in_plugin()
         {
+	        if ( !rsssl_user_can_manage() ) {
+		        return;
+	        }
             //we add some styling to this page
             add_action('admin_enqueue_scripts', array($this, 'add_vulnerability_styles'));
             //we add an extra column to the plugins page
@@ -626,6 +659,9 @@ if (!class_exists("rsssl_vulnerabilities")) {
          */
         protected function add_notice($plugin): void
         {
+	        if ( !rsssl_user_can_manage() ) {
+		        return;
+	        }
             $riskSetting = rsssl_get_option('vulnerability_notification_dashboard');
             if (!$riskSetting) {
                 $risk = 'low';

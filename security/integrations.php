@@ -89,6 +89,7 @@ $rsssl_integrations_list = apply_filters( 'rsssl_integrations', array(
         'impact'               => 'medium',
         'risk'                 => 'medium',
         'option_id'            => 'enable_vulnerability_scanner',
+		'admin_only'           => true,
         'always_include'       => true,
     ),
 ) );
@@ -134,9 +135,14 @@ function rsssl_integrations() {
 			[
 				'option_id' => false,
 				'always_include'=>false,
+				'admin_only'=>false,
 				'folder' => false,
 			]
 		);
+
+		if ( $details['admin_only'] && !rsssl_admin_logged_in() ) {
+			continue;
+		}
 
 		if ( rsssl_is_integration_enabled( $plugin, $details ) ) {
 			$path = apply_filters('rsssl_integrations_path', rsssl_path, $plugin);
