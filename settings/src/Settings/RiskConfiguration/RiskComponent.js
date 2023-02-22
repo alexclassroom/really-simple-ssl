@@ -14,9 +14,47 @@ const RiskComponent = (props) => {
         fetchRiskData();
     }, []);
 
+    const buildColumn = (column) => {
+        return {
+            name: column.name,
+            sortable: column.sortable,
+            width: column.width,
+            selector: row => row[column.column],
+            grow: column.grow,
+        };
+    }
+
+    const dispachNotification = ( risk, type ) => {
+        let text = __( 'Measure was set for ' + risk, 'really-simple-ssl' );
+        dispatch('core/notices').createNotice(
+            type,
+            text,
+            {
+                __unstableHTML: true,
+                id: 'rsssl_settings_saved',
+                type: 'snackbar',
+                isDismissible: false,
+            }
+        ).then(sleeper(2000)).then(( response ) => {
+            dispatch('core/notices').removeNotice('rsssl_settings_saved');
+        });
+    }
+
+    const onChangeHandler = (fieldValue, item) => {
+        updateRiskData(item.id, fieldValue).then((response) => {
+            dispachNotification(item.risk, 'success');
+        })
+            .then((response) => {
+                dispachNotification(item.risk, 'error');
+            });
+
+    }
+
     //we only proceed if the data is loaded
-    if (!dataLoaded) {
-        return null;
+    if ( !dataLoaded ) {
+        return (
+            <></>
+        )
     }
 
     //we create the columns
@@ -63,41 +101,7 @@ const RiskComponent = (props) => {
         </div>
     )
 
-    function buildColumn(column) {
-        return {
-            name: column.name,
-            sortable: column.sortable,
-            width: column.width,
-            selector: row => row[column.column],
-            grow: column.grow,
-        };
-    }
 
-    function dispachNotification( risk, type ) {
-        let text = __( 'Measure was set for ' + risk, 'really-simple-ssl' );
-        dispatch('core/notices').createNotice(
-            type,
-            text,
-            {
-                __unstableHTML: true,
-                id: 'rsssl_settings_saved',
-                type: 'snackbar',
-                isDismissible: false,
-            }
-        ).then(sleeper(2000)).then(( response ) => {
-            dispatch('core/notices').removeNotice('rsssl_settings_saved');
-        });
-    }
-
-    function onChangeHandler(fieldValue, item) {
-        updateRiskData(item.id, fieldValue).then((response) => {
-            dispachNotification(item.risk, 'success');
-        })
-            .then((response) => {
-                dispachNotification(item.risk, 'error');
-            });
-        ;
-    }
 
 }
 
