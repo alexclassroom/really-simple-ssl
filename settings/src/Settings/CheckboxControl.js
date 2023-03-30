@@ -26,8 +26,8 @@ const CheckboxControl = (props) => {
                             onChange={ ( e ) => onChangeHandler(e) }
                             id={field.id}
                             type="checkbox"
-                            disabled={ field.disabled }
-                            />
+                            disabled={props.disabled}
+                        />
                         <span className="components-form-toggle__track"></span>
                         <span className="components-form-toggle__thumb"></span>
                         </span>
