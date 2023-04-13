@@ -1486,7 +1486,6 @@ if (!function_exists('rsssl_vulnerabilities_get_stats')) {
     }
 }
 
-
 /* End of Routing and API's */
 
 if (function_exists('make_test_notifications')) {
