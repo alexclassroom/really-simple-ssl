@@ -147,7 +147,6 @@ if (!class_exists("rsssl_vulnerabilities")) {
         {
             $instance = self::instance();
 
-            update_option('rsssl_vulnerabilities_first_run', true);
             rsssl_update_option('enable_vulnerability_scanner', '1');
             //we check if the schedule already exists, if not, we add it.
             if (!wp_next_scheduled('rsssl_vulnerabilities_cron')) {
@@ -327,7 +326,7 @@ if (!class_exists("rsssl_vulnerabilities")) {
 
 
             $vulEnabled = rsssl_get_option('enable_vulnerability_scanner');
-            $firstRun = get_option('rsssl_vulnerabilities_first_run');
+            $firstRun = get_option('rsssl_vulnerability_scanner_first_run');
 
             $updates = 0;
             $vulnerabilities = [];

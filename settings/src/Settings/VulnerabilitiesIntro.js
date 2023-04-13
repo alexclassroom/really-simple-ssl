@@ -10,17 +10,20 @@ import useVulnerabilityData from "../Dashboard/Vulnerabilities/VulnerabilityData
 
 const VulnerabilitiesIntro = (props) => {
     //first we define a state for the steps
-    const [ isOpen, setOpen ] = useState( false );
-    const {firstrun} = useVulnerabilityData();
+    const [isOpen, setOpen] = useState(false);
+    const {firstrun, firstRunFinished} = useVulnerabilityData();
 
     //this function closes the modal when onClick is activated
-    if(!isOpen) {
+    if (!isOpen) {
         return (
             <>
                 <Modal
                     title={__('Introducing vulnerabilities', 'really-simple-ssl')}
                     className="rsssl-modal"
-                    onRequestClose={setOpen}
+                    onRequestClose={() => {
+                        setOpen;
+                        firstRunFinished();
+                    }}
                     shouldCloseOnClickOutside={true}
                     shouldCloseOnEsc={true}
                     overlayClassName="rsssl-modal-overlay"
@@ -71,6 +74,7 @@ const VulnerabilitiesIntro = (props) => {
                             isPrimary
                             onClick={() => {
                                 setOpen(true);
+                                firstRunFinished();
                                 //we redirect to dashboard
                                 window.location.href = "/wp-admin/options-general.php?page=really-simple-security#dashboard";
                             }}
@@ -80,6 +84,8 @@ const VulnerabilitiesIntro = (props) => {
                         <Button isSecondary
                                 onClick={() => {
                                     setOpen(true);
+                                    //we set the first run to true
+                                    firstRunFinished();
                                 }}
                         >
                             {__('Dismiss', 'really-simple-ssl')}
