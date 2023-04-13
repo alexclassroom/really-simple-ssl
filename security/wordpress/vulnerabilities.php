@@ -100,6 +100,10 @@ if (!class_exists("rsssl_vulnerabilities")) {
         public function init()
         {
 
+            if (!rsssl_admin_logged_in()) {
+                return;
+            }
+
             //we check if the vulnerability scanner is enabled and then the fun happens.
             if (rsssl_get_option('enable_vulnerability_scanner')) {
                 $this->check_files();
@@ -112,6 +116,9 @@ if (!class_exists("rsssl_vulnerabilities")) {
 
         public function run()
         {
+	        if (!rsssl_admin_logged_in()) {
+		        return;
+	        }
             //we check if the vulnerability scanner is enabled and then the fun happens.
             //first we need to make sure we update the files every day. So we add a daily cron.
             add_filter('rsssl_daily_cron', array($this, 'daily_cron'));
@@ -145,6 +152,9 @@ if (!class_exists("rsssl_vulnerabilities")) {
          */
         public static function firstRun(): array
         {
+	        if (!rsssl_admin_logged_in()) {
+		        return;
+	        }
             $instance = self::instance();
 
             update_option('rsssl_vulnerabilities_first_run', true, false);
@@ -283,6 +293,9 @@ if (!class_exists("rsssl_vulnerabilities")) {
          */
         public static function get_stats($data): array
         {
+	        if (!rsssl_admin_logged_in()) {
+		        return [];
+	        }
             $self = new self();
             $vulEnabled = rsssl_get_option('enable_vulnerability_scanner');
             $firstRun = get_option('rsssl_vulnerabilities_first_run');
@@ -534,6 +547,10 @@ if (!class_exists("rsssl_vulnerabilities")) {
          */
         public function check_files(): void
         {
+	        if (!rsssl_admin_logged_in()) {
+		        return;
+	        }
+
             $trigger = false;
             //we download the manifest file if it doesn't exist or is older than 12 hours
             if ($this->validate_local_file(false, true)) {
@@ -567,6 +584,10 @@ if (!class_exists("rsssl_vulnerabilities")) {
 
         public function reload_files_on_update()
         {
+	        if (!rsssl_admin_logged_in()) {
+		        return;
+	        }
+
             //if the file is not older than 10 minutes, we don't download it again.
             if ($this->get_file_stored_info(false, false) > time() - 600) {
                 return;
@@ -586,6 +607,10 @@ if (!class_exists("rsssl_vulnerabilities")) {
          */
         private function validate_local_file(bool $isCore = false, bool $manifest = false): bool
         {
+	        if (!rsssl_admin_logged_in()) {
+		        return false;
+	        }
+
             if (!$manifest) {
                 //if we don't check for the manifest, we check the other files.
                 $isCore ? $file = 'core.json' : $file = 'components.json';
@@ -621,6 +646,9 @@ if (!class_exists("rsssl_vulnerabilities")) {
          */
         private function download(string $url)
         {
+	        if (!rsssl_admin_logged_in()) {
+		        return null;
+	        }
             //now we check if the file remotely exists and then log an error if it does not.
             $headers = get_headers($url);
             if (strpos($headers[0], '200')) {
@@ -645,6 +673,10 @@ if (!class_exists("rsssl_vulnerabilities")) {
          */
         private function store_file($data, bool $isCore = false, bool $manifest = false): void
         {
+	        if (!rsssl_admin_logged_in()) {
+		        return;
+	        }
+
             //if the data is empty, we return null
             if (empty($data)) {
                 return;
@@ -677,6 +709,9 @@ if (!class_exists("rsssl_vulnerabilities")) {
 
         public function get_file_stored_info($isCore = false, $manifest = false)
         {
+	        if (!rsssl_admin_logged_in()) {
+		        return false;
+	        }
             $upload_dir = wp_upload_dir();
             $upload_dir = $upload_dir['basedir'];
             $upload_dir = $upload_dir . self::RSS_VULNERABILITIES_LOCATION;
@@ -707,6 +742,9 @@ if (!class_exists("rsssl_vulnerabilities")) {
          */
         protected function download_core_vulnerabilities(): void
         {
+	        if (!rsssl_admin_logged_in()) {
+		        return;
+	        }
             global $wp_version;
             $url = self::RSS_SECURITY_API . 'core/WordPress.json';
             $data = $this->download($url);
@@ -729,7 +767,9 @@ if (!class_exists("rsssl_vulnerabilities")) {
          */
         protected function download_plugin_vulnerabilities(): void
         {
-
+	        if (!rsssl_admin_logged_in()) {
+		        return;
+	        }
             //we get all the installed plugins
             $installed_plugins = get_plugins();
             //first we get the manifest file
@@ -796,6 +836,9 @@ if (!class_exists("rsssl_vulnerabilities")) {
          */
         private function get_components()
         {
+	        if (!rsssl_admin_logged_in()) {
+		        return null;
+	        }
             $upload_dir = wp_upload_dir();
             $upload_dir = $upload_dir['basedir'];
             $upload_dir = $upload_dir . self::RSS_VULNERABILITIES_LOCATION;
@@ -812,6 +855,9 @@ if (!class_exists("rsssl_vulnerabilities")) {
         /* Section for the core files Note: No manifest is needed */
         private function get_core()
         {
+	        if (!rsssl_admin_logged_in()) {
+		        return false;
+	        }
             $upload_dir = wp_upload_dir();
             $upload_dir = $upload_dir['basedir'];
             $upload_dir = $upload_dir . self::RSS_VULNERABILITIES_LOCATION;
@@ -835,8 +881,7 @@ if (!class_exists("rsssl_vulnerabilities")) {
         public function show_theme_warning($hook)
         {
             $screen = get_current_screen();
-
-            if ($screen->id !== 'themes') {
+            if ($screen && $screen->id !== 'themes') {
                 return;
             }
 
@@ -856,6 +901,10 @@ if (!class_exists("rsssl_vulnerabilities")) {
 
         public function enqueue_theme_warning_scripts($hook)
         {
+	        if (!rsssl_admin_logged_in()) {
+		        return;
+	        }
+
             //we get all components with vulnerabilities
             $components = $this->get_components();
             wp_enqueue_script('rsssl_vulnerabilities', plugins_url('../../scripts.js', __FILE__), array(), '1.0.0', true);
@@ -906,9 +955,13 @@ if (!class_exists("rsssl_vulnerabilities")) {
 
         public function show_theme_closed()
         {
+	        if (!rsssl_admin_logged_in()) {
+		        return;
+	        }
+
             $screen = get_current_screen();
             $theme = wp_get_theme();
-            if ($screen->id !== 'settings_page_really-simple-security') {
+            if ($screen && $screen->id !== 'settings_page_really-simple-security') {
                 add_action('admin_notices', function () use ($theme) {
                     ?>
                     <div class="notice notice-error is-dismissible">
@@ -1146,28 +1199,6 @@ if (!class_exists("rsssl_vulnerabilities")) {
             add_action('manage_plugins_custom_column', array($this, 'add_vulnerability_field'), 10, 3);
         }
 
-        /**
-         * This functions adds a notice for the admin page
-         */
-        protected function add_admin_notice($plugin): string
-        {
-            //first we get the setting from options
-            $riskSetting = rsssl_get_option('vulnerability_notification_sitewide');
-            if (!$riskSetting) {
-                $risk = 'high';
-            } else {
-                if ($plugin['risk_level'] === '') {
-                    $risk = 'low';
-                } else {
-                    $risk = $this->risk_naming[$plugin['risk_level']];
-                }
-
-            }
-
-            //we then build the notice
-            return '<div data-dismissible="disable-done-notice-forever" class="notice notice-error is-dismissible"><p>' . '<strong>' . $plugin['Name'] . '</strong> ' . __("has vulnerabilities.", "really-simple-ssl") . '</p></div>';
-        }
-
         /* End of private functions | Feedback, Styles and scripts */
 
 
@@ -1193,7 +1224,9 @@ if (!class_exists("rsssl_vulnerabilities")) {
          */
         private function download_manifest()
         {
-
+	        if (!rsssl_admin_logged_in()) {
+		        return;
+	        }
             $url = self::RSS_SECURITY_API . 'manifest.json';
             $data = $this->download($url);
 
@@ -1211,6 +1244,9 @@ if (!class_exists("rsssl_vulnerabilities")) {
          */
         private function getManifest()
         {
+	        if (!rsssl_admin_logged_in()) {
+		        return;
+	        }
             $upload_dir = wp_upload_dir();
             $upload_dir = $upload_dir['basedir'];
             $upload_dir = $upload_dir . self::RSS_VULNERABILITIES_LOCATION;
@@ -1265,32 +1301,6 @@ if (!class_exists("rsssl_vulnerabilities")) {
             return $mailer->send_mail();
         }
 
-        function make_test_notifications()
-        {
-            return true;
-        }
-
-        private function store_session(string $string, bool $true, int $int)
-        {
-            //we store a session for three minutes to display the notification
-            $_SESSION[$string] = $true;
-            $_SESSION['expire_time'] = time() + $int;
-        }
-
-        private function check_session(string $string): bool
-        {
-            if (isset($_SESSION[$string]) && $_SESSION['expire_time'] >= time()) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        private function clear_cache()
-        {
-            rsssl_cache::this()->flush();
-        }
-
         public function count_risk_levels()
         {
             $plugins = $this->workable_plugins;
@@ -1329,6 +1339,10 @@ if (!class_exists("rsssl_vulnerabilities")) {
 
         public function send_vulnerability_mail()
         {
+	        if (!rsssl_admin_logged_in()) {
+		        return;
+	        }
+
             //first we check if the user wants to receive emails
             if (!rsssl_get_option('send_notifications_email')) {
                 return;
@@ -1354,15 +1368,17 @@ if (!class_exists("rsssl_vulnerabilities")) {
 
             }
             //date format is named month day year
-            $date = date('F j, Y');
+            $date = date(get_option('date_format'));
             $domain = get_site_url();
             $mailer = new rsssl_mailer();
             $mailer->subject = sprintf(__("Vulnerability Alert: %s", "really-simple-ssl"), $domain);
             $mailer->title = sprintf(__("%s: %s vulnerabilities found", "really-simple-ssl"), $date, $total);
-            $message = sprintf(__("This is a vulnerability alert from Really Simple SSL for %s. We encourage to take appropriate action. To know more about handling vulnerabilities with Really Simple SSL, please 
-			<a href='https://really-simple-plugins.com/instructions/about-vulnerabilities/'>read this article</a>.", "really-simple-ssl"), $domain);
+            $message = sprintf( __("This is a vulnerability alert from Really Simple SSL for %s.","really-simple-ssl"),$domain)
+                       ." ".
+                       __("We encourage to take appropriate action.", "really-simple-ssl")
+                       ." ".
+                       sprintf(__("To know more about handling vulnerabilities with Really Simple SSL, please %sread this article%s.", "really-simple-ssl"), '<a href="https://really-simple-plugins.com/instructions/about-vulnerabilities/" target="_blank">','</a>');
             $mailer->message = $message;
-            $mailer->to = get_option('admin_email');
             $mailer->warning_blocks = $blocks;
             if ($total > 0) {
                 //if for some reason the total is 0, we don't send an email
@@ -1402,6 +1418,10 @@ if (!class_exists("rsssl_vulnerabilities")) {
 
         private function assemble_first_run()
         {
+            if (!rsssl_admin_logged_in()){
+                return [];
+            }
+
             $this->check_files();
             $this->cache_installed_plugins();
 
@@ -1487,29 +1507,3 @@ if (!function_exists('rsssl_vulnerabilities_get_stats')) {
 }
 
 /* End of Routing and API's */
-
-if (function_exists('make_test_notifications')) {
-    function make_test_notifications()
-    {
-        $notices = get_option('rsssl_admin_notices');
-        $notice = [
-            'callback' => '_true_',
-            'score' => 1,
-            'show_with_options' => ['enable_vulnerability_scanner'],
-            'output' => [
-                'true' => [
-                    'title' => __('Test notification', 'really-simple-ssl'),
-                    'msg' => __("This is a 'Dashboard' notification test by Really Simple SSL. You can safely ignore this message. (x)", "really-simple-ssl"),
-                    'link' => 'https://really-simple-ssl.com/knowledge-base/vulnerability-scanner/',
-                    'icon' => 'warning',
-                    'type' => 'warning',
-                    'dismissible' => true,
-                    'admin_notice' => true,
-                ]
-            ]
-        ];
-        $notices['test_vulnerability_notice'] = $notice;
-        //we store the notice in the notices array
-        update_option('rsssl_admin_notices', $notices);
-    }
-}
