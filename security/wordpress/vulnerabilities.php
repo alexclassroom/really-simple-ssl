@@ -153,7 +153,7 @@ if (!class_exists("rsssl_vulnerabilities")) {
         public static function firstRun(): array
         {
 	        if (!rsssl_admin_logged_in()) {
-		        return;
+		        return [];
 	        }
             $instance = self::instance();
 
